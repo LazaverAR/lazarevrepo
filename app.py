@@ -5,6 +5,7 @@ def show_menu():
     print("3. Mark task as done")
     print("4. Exit")
 
+
 def view_tasks(tasks):
     if not tasks:
         print("Your to-do list is empty!")
@@ -14,10 +15,12 @@ def view_tasks(tasks):
             status = "✓" if done else "✗"
             print(f"{i}. [{status}] {task}")
 
+
 def add_task(tasks):
     task = input("Enter a new task: ")
     tasks.append((task, False))
     print(f"Added task: {task}")
+
 
 def mark_done(tasks):
     view_tasks(tasks)
@@ -33,6 +36,7 @@ def mark_done(tasks):
             print("Invalid task number.")
     except ValueError:
         print("Please enter a valid number.")
+
 
 def main():
     tasks = []
@@ -50,6 +54,7 @@ def main():
             break
         else:
             print("Invalid choice. Please try again.")
+
 
 if __name__ == "__main__":
     main()
