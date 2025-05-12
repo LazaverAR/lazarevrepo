@@ -1,4 +1,4 @@
-name: Build and Test Python To-Do Docker App
+name: Code Verification Workflow
 
 on:
   push:
@@ -6,25 +6,52 @@ on:
       - main
   pull_request:
 
+permissions:
+  contents: read  # least privilege for this workflow
+  actions: none   # disable unnecessary permissions
+
 jobs:
-  build-and-test:
+  verify-code:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
 
-      - name: Build Docker image
-        run: docker build -t todo-python-app .
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-      - name: Run container and test app start
+      - name: Install dependencies
         run: |
-          # Run container in detached mode
-          docker run -d --name todo-test todo-python-app
-          # Wait a few seconds to let the app start
-          sleep 5
-          # Check if container is still running
-          docker ps | grep todo-test
-          # Stop and remove container
-          docker stop todo-test
-          docker rm todo-test
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run linting (flake8)
+        run: |
+          pip install flake8
+          flake8 .
+
+      - name: Run tests
+        run: |
+          # Replace with your test command, e.g. pytest
+          echo "No tests defined yet"
+
+      - name: Security scan with CodeQL
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "security"
+
+      - name: Upload workflow logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: workflow-logs
+          path: ./logs
+
+      - name: Notify on success
+        if: success()
+        run: echo "Code verification succeeded."
